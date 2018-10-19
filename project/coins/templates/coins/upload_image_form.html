@@ -1,9 +1,0 @@
-{% extends 'base.html' %}
-
-{% block content %}
-    <form action="{% url 'upload_image' %}" method="POST">
-        {% csrf_token %}
-        <input type="file" name="image">
-        <button type="submit">upload</button>
-    </form>
-{% endblock %}
