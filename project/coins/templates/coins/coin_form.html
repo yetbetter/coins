@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if request.image_info %}
+        <p>Ширина: {{ request.image_info.width }} px</p>
+        <p>Высота: {{ request.image_info.height }} px</p>
+        <svg width="700" height="200">
+            <rect height="200" width="200" style="fill:rgb({{ request.image_info.red }},{{ request.image_info.green }},{{ request.image_info.blue }});"></rect>
+        </svg>
+        <p>Кол-во монет {{ request.image_info.number_of_coins }}</p>
+    {% endif %}
+
+    {{ form.non_field_errors }}
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.image.errors }}
+        <input type="file" name="image">
+        <button type="submit">upload</button>
+    </form>
+{% endblock %}

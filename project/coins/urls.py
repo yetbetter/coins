@@ -1,9 +1,9 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
-from coins.views import CountCoinView
+from coins.views import CoinCreate
 
 urlpatterns = [
-    # path('', CoinList.as_view(), name='coin-list'),
-    # path('coin/create', CoinCreate.as_view(), name='coin-create'),
-    path('', CountCoinView.as_view(), name='coin-count')
-]
+    path('', CoinCreate.as_view(), name='coin-create')
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

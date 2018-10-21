@@ -1,45 +1,32 @@
-from django.contrib import messages
-from django.core.files.images import get_image_dimensions
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.urls import reverse
-from django.views.generic import CreateView, ListView, FormView
-
+from django.views.generic import CreateView
 from coins.models import Coin
 
-
-# def home(request):
-#     return render(request, 'coins/upload_image_form.html')
-#
-#
-# def upload(request):
-#     images = request.FILES.getlist('images')
-#
-#     for image in images:
-#         print(get_image_dimensions(image))
-#     return HttpResponse(images)
-
-from coins.forms import CountCoinForm
+from coins import utils
 
 
-# class CoinList(ListView):
-#     model = Coin
-#
-#
-# class CoinCreate(CreateView):
-#     model = Coin
-#     fields = ['image']
-#     success_url = '/'
-
-
-class CountCoinView(FormView):
-    template_name = 'coins/coin_count.html'
-    form_class = CountCoinForm
+class CoinCreate(CreateView):
+    model = Coin
+    fields = ['image']
     success_url = '/'
 
+    def get(self, request, *args, **kwargs):
+        self.request.image_info = self.request.session.pop('image_info', None)
+        return super().get(request, *args, **kwargs)
+
     def form_valid(self, form):
-        # image = self.request.FILES.get('image')
-        # print(get_image_dimensions(image))
-        messages.add_message(self.request, messages, 'hi')
+        coin = form.save()
+        opened_img = utils.open_image(coin.image.path)
+        width, height = utils.get_metadata(opened_img)
+        red, green, blue = utils.get_average_color(opened_img)
+        image_info = {
+            'width': width,
+            'height': height,
+            'red': red,
+            'green': green,
+            'blue': blue,
+            'number_of_coins': utils.count_coins(coin.image.path)
+        }
+        self.request.session['image_info'] = image_info
         return super().form_valid(form)
+
 
